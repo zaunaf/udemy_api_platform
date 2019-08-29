@@ -9,7 +9,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BlogPostRepository")
- * @ApiResource()
+ * @ApiResource(
+ *      itemOperations={"get"},
+ *      collectionOperations={"get"}
+ * )
  */
 class BlogPost
 {

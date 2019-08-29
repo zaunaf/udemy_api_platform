@@ -9,8 +9,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * @ApiResource()
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @ApiResource(
+ *      itemOperations={"get"},
+ *      collectionOperations={"get"}
+ * )
  */
 class User implements UserInterface
 {
