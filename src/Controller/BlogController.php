@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\BlogPost;
+// use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -14,8 +15,12 @@ use Symfony\Component\Serializer\Serializer;
 class BlogController extends AbstractController
 {
 
+    // * @ParamConverter("post", class="App:BlogPost")
+    // public function post(BlogPost $blogPost) {
+    //     return $this->json($blogPost);
+    // }
     /**
-     * @Route("/post/{id}", name="blog_by_id", requirements={"id"="\d+"})
+     * @Route("/post/{id}", name="blog_by_id", requirements={"id"="\d+"}, methods={"GET"})
      */
     public function post($id) {
         return $this->json(
@@ -24,7 +29,7 @@ class BlogController extends AbstractController
     }
 
     /**
-     * @Route("/post/{slug}", name="blog_by_slug") 
+     * @Route("/post/{slug}", name="blog_by_slug", methods={"GET"}) 
      */
     public function postBySlug($slug)
     {
@@ -35,7 +40,7 @@ class BlogController extends AbstractController
 
     
     /**
-     * @Route ("/{page}", name="blog_list", defaults={"page": 5}, requirements={"page"="\d+"})
+     * @Route ("/{page}", name="blog_list", defaults={"page": 5}, requirements={"page"="\d+"}, methods={"GET"})
      */
     public function list($page = 1, Request $request) {
         $limit = $request->get('limit', 10);
@@ -82,4 +87,32 @@ class BlogController extends AbstractController
         }
     }
 
+    /**
+     * @Route("/post/{id}", name="blog_delete", methods={"DELETE"})
+     */
+    public function delete($id)
+    {
+        try {
+
+            $blogPost = $this->getDoctrine()->getRepository(BlogPost::class)->find($id);
+
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($blogPost);
+            $em->flush();
+
+            return $this->json(array(
+                "sucess" => true,
+                "message" => "Data deleted.. "
+            ));
+
+        } catch (Exception $e) {
+
+            return $this->json(array(
+                "sucess" => false,
+                "message" => "Data is failed to be deleted: ", $e->getMessage()
+            ));
+
+        }
+
+    }
 }
