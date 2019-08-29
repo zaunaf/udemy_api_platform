@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiResource;
 
 /**
  * @ApiResource()
@@ -34,6 +34,12 @@ class Comment
      */
     private $author;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Entity\BlogPost", inversedBy="comments")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $blogPost;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -63,7 +69,7 @@ class Comment
         return $this;
     }
 
-        /**
+    /**
      * @return User
      */
     public function getAuthor(): User
@@ -80,4 +86,21 @@ class Comment
         return $this;
     }
 
+    /**
+     * @return BlogPost
+     */
+    public function getBlogPost(): BlogPost
+    {
+        return $this->blogPost;
+    }
+
+    /**
+     * @var BlogPost blogPost
+     * @return self
+     */
+    public function setBlogPost(BlogPost $blogPost): self
+    {
+        $this->blogPost = $blogPost;
+        return $this;
+    }
 }

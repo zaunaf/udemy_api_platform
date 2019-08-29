@@ -2,12 +2,13 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\BlogPost;
-use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use DOctrine\Common\Persistence\ObjectManager;
-use Faker\Factory;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Faker\Factory;
+use App\Entity\BlogPost;
+use App\Entity\Comment;
+use App\Entity\User;
 
 class AppFixtures extends Fixture
 {
@@ -45,18 +46,18 @@ class AppFixtures extends Fixture
         $user->setPassword($this->passwordEncoder->encodePassword($user, 'admin'));
         $user->setName('Admin');
         $user->setEmail('admin@gmail.com');
-        $this->addReference('user_admin', $user);
-
         $objectManager->persist($user);
+        $this->addReference('user_admin', $user);
 
         $user = new User();
         $user->setUsername('zuck');
         $user->setPassword($this->passwordEncoder->encodePassword($user, 'sukasepjay'));
         $user->setName('Zuckachev');
         $user->setEmail('zuckachev@gmail.com');
-        $this->addReference('user_zuck', $user);
-        
         $objectManager->persist($user);
+        $this->addReference('user_zuck', $user);        
+        
+        $objectManager->flush();
     }
 
     public function loadBlogPosts(ObjectManager $objectManager)
@@ -107,16 +108,49 @@ class AppFixtures extends Fixture
             $blogPost->setContent($this->faker->realText());
             $blogPost->setAuthor($this->getReference('user_admin'));
             $blogPost->setSlug($slug);
+            $objectManager->persist($blogPost);
 
-            $objectManager->persist($blogPost);    
+            // Create reference for the later linking by comments
+            $this->setReference("blog_post_".$i, $blogPost);
         }
-        // $this->setReference($slug, $blogPost);
-
+        
         $objectManager->flush();
     }
 
     public function loadComments(ObjectManager $objectManager)
     {
+        $comment = new Comment();
+        $comment->setContent("First comment on the first post!!");
+        $comment->setPublished($this->faker->dateTimeThisYear);
+        $comment->setAuthor($this->getReference('user_admin'));
+        $comment->setBlogPost($this->getReference('a-first-post'));
+        $objectManager->persist($comment);
         
+        $comment = new Comment();
+        $comment->setContent("First comment on the second post!!");
+        $comment->setPublished($this->faker->dateTimeThisYear);
+        $comment->setAuthor($this->getReference('user_admin'));
+        $comment->setBlogPost($this->getReference('a-second-post'));
+        $objectManager->persist($comment);
+        
+        $comment = new Comment();
+        $comment->setContent("First comment on the third post!!");
+        $comment->setPublished($this->faker->dateTimeThisYear);
+        $comment->setAuthor($this->getReference('user_admin'));
+        $comment->setBlogPost($this->getReference('a-third-post'));
+        $objectManager->persist($comment);
+
+        for ($i = 0; $i < 100; $i++) {
+            for ($j = 0; $j < 100; $j++) {
+                $comment = new Comment();
+                $comment->setContent($this->faker->realText());
+                $comment->setPublished($this->faker->dateTimeThisYear);
+                $comment->setAuthor($this->getReference('user_zuck'));
+                $comment->setBlogPost($this->getReference('blog_post_'.$i));
+                $objectManager->persist($comment);
+            }
+        }
+
+        $objectManager->flush();
     }
 }
