@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -32,23 +33,41 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"read"})
+     * @Assert\NotBlank()
+     * @Assert\Length(min=6, max=255)
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank()
+     * @Assert\Regex(
+     *  pattern="/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}/",
+     *  message="Password must have at least 8 characters and have at least one number, one lower case letter and one uppercase letter"
+     * )
      */
     private $password;
 
     /**
+     * @Assert\NotBlank()
+     * @Assert\Expression(
+     *  "this.getPassword() === this.getRetypedPassword()",
+     *   message="Passwords does not match"
+     * )
+     */
+    private $retypedPassword;
+
+    /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"read"})
+     * @Assert\NotBlank()
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"read"})
+     * @Assert\Email()
      */
     private $email;
 
@@ -65,7 +84,7 @@ class User implements UserInterface
     private $comments;
 
     public function __construct()
-    {
+    {   
         $this->posts = new ArrayCollection();
         $this->comments = new ArrayCollection();
     }
@@ -160,6 +179,17 @@ class User implements UserInterface
         return $this;
     }
 
+    public function getRetypedPassword()
+    {
+        return $this->retypedPassword;
+    }
+
+    public function setRetypedPassword($retypedPassword)
+    {
+        $this->retypedPassword = $retypedPassword;
+        return $this;
+    }
+
     public function getRoles()
     {
         return ['ROLE_USER'];
@@ -174,4 +204,6 @@ class User implements UserInterface
     {
         
     }
+
+    
 }
