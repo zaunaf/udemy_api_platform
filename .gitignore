@@ -13,3 +13,7 @@
 ###< symfony/web-server-bundle ###
 README.md
 doc_images
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
