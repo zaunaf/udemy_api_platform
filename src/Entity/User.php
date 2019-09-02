@@ -12,6 +12,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @UniqueEntity("username")
+ * @UniqueEntity("email")
  * @ApiResource(
  *      itemOperations={"get"},
  *      collectionOperations={"post"},
