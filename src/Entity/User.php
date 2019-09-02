@@ -16,7 +16,11 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @UniqueEntity("username")
  * @UniqueEntity("email")
  * @ApiResource(
- *      itemOperations={"get"},
+ *      itemOperations={
+ *          "get"={
+ 
+ *           }
+ *      },
  *      collectionOperations={"post"},
  *      normalizationContext={
  *          "groups"={"read"}
