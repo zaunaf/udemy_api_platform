@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CommentRepository")
@@ -23,7 +24,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
  *      }
  * )
  */
-class Comment
+class Comment implements AuthoredEntityInterface
 {
     /**
      * @ORM\Id()
@@ -83,18 +84,12 @@ class Comment
         return $this;
     }
 
-    /**
-     * @return User
-     */
     public function getAuthor(): User
     {
         return $this->author;
     }
 
-    /**
-     * @return self
-     */
-    public function setAuthor(User $author)
+    public function setAuthor(UserInterface $author): AuthoredEntityInterface
     {
         $this->author = $author;
         return $this;
