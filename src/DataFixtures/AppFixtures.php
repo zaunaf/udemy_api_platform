@@ -22,6 +22,34 @@ class AppFixtures extends Fixture
      */
     private $faker;
 
+    private const USERS = [
+        [
+            'username' => 'admin',
+            'password' => 'Rahasiy4',
+            'name' => 'Admin',
+            'email' => 'admin@gmail.com',
+        ],
+        [
+            'username' => 'abah',
+            'password' => 'Rahasiy4',
+            'name' => 'Abah',
+            'email' => 'abah@gmail.com',
+        ],
+        [
+            'username' => 'zuckachev',
+            'password' => 'Rahasiy4',
+            'name' => 'Zuckachev',
+            'email' => 'zuckachev@gmail.com',
+        ],
+        [
+            'username' => 'zuck',
+            'password' => 'Rahasiy4',
+            'name' => 'Zuck',
+            'email' => 'zuck@gmail.com',
+        ]
+    ];
+
+
     public function __construct(UserPasswordEncoderInterface $passwordEncoder)
     {
         $this->passwordEncoder = $passwordEncoder;
@@ -41,23 +69,38 @@ class AppFixtures extends Fixture
     
     public function loadUsers(ObjectManager $objectManager) 
     {
-        $user = new User();
-        $user->setUsername('admin');
-        $user->setPassword($this->passwordEncoder->encodePassword($user, 'admin'));
-        $user->setName('Admin');
-        $user->setEmail('admin@gmail.com');
-        $objectManager->persist($user);
-        $this->addReference('user_admin', $user);
+        foreach (self::USERS as $userFixture) {
+            $user = new User();
+            $user->setUsername($userFixture['username']);
+            $user->setPassword($this->passwordEncoder->encodePassword($user, $userFixture['password']));
+            $user->setName($userFixture['name']);
+            $user->setEmail($userFixture['email']);
+            $objectManager->persist($user);
+            $this->addReference('user_'.$userFixture['username'], $user);
+        }
 
-        $user = new User();
-        $user->setUsername('zuck');
-        $user->setPassword($this->passwordEncoder->encodePassword($user, 'sukasepjay'));
-        $user->setName('Zuckachev');
-        $user->setEmail('zuckachev@gmail.com');
-        $objectManager->persist($user);
-        $this->addReference('user_zuck', $user);        
+        // $user = new User();
+        // $user->setUsername('admin');
+        // $user->setPassword($this->passwordEncoder->encodePassword($user, 'admin'));
+        // $user->setName('Admin');
+        // $user->setEmail('admin@gmail.com');
+        // $objectManager->persist($user);
+        // $this->addReference('user_admin', $user);
+
+        // $user = new User();
+        // $user->setUsername('zuck');
+        // $user->setPassword($this->passwordEncoder->encodePassword($user, 'sukasepjay'));
+        // $user->setName('Zuckachev');
+        // $user->setEmail('zuckachev@gmail.com');
+        // $objectManager->persist($user);
+        // $this->addReference('user_zuck', $user);        
         
         $objectManager->flush();
+    }
+    
+    public function getRandomUserReference(): User
+    {        
+        return $this->getReference('user_'.self::USERS[rand(0,3)]['username']);
     }
 
     public function loadBlogPosts(ObjectManager $objectManager)
@@ -77,7 +120,7 @@ class AppFixtures extends Fixture
         $blogPost->setTitle('A second post!');
         $blogPost->setPublished(new \DateTime('2018-08-27 19:00:00'));
         $blogPost->setContent('Second fixture post');
-        $blogPost->setAuthor($this->getReference('user_zuck'));
+        $blogPost->setAuthor($this->getReference('user_abah'));
         $blogPost->setSlug('a-second-post');
         $this->setReference('a-second-post', $blogPost);
 
@@ -100,13 +143,22 @@ class AppFixtures extends Fixture
         for($i = 0; $i < 100; $i++) {
             
             $blogPost = new BlogPost();
+            
             $title = $this->faker->realText(40);
-            $slug = strtolower(str_replace(" ", "", $title));
+            
+            $slug = str_replace(["'", "\"","-", '!', '?', '(', ')', ':', ';', '.', ','], "", trim($title));
+            $slug = str_replace(" ", "-", $slug);
+            $slug = str_replace(["--", "---"], "-", $slug);
+            $slug = strtolower($slug);
     
             $blogPost->setTitle($title);
             $blogPost->setPublished($this->faker->dateTimeThisYear('now', 'Asia/Jakarta'));
             $blogPost->setContent($this->faker->realText());
-            $blogPost->setAuthor($this->getReference('user_admin'));
+            
+            // Randomize this
+            // $blogPost->setAuthor($this->getReference('user_admin'));
+            $blogPost->setAuthor($this->getRandomUserReference());
+            
             $blogPost->setSlug($slug);
             $objectManager->persist($blogPost);
 
@@ -145,7 +197,11 @@ class AppFixtures extends Fixture
                 $comment = new Comment();
                 $comment->setContent($this->faker->realText());
                 $comment->setPublished($this->faker->dateTimeThisYear);
-                $comment->setAuthor($this->getReference('user_zuck'));
+                
+                // Randomize this
+                // $comment->setAuthor($this->getReference('user_zuck'));
+                $comment->setAuthor($this->getRandomUserReference());
+
                 $comment->setBlogPost($this->getReference('blog_post_'.$i));
                 $objectManager->persist($comment);
             }
