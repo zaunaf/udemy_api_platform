@@ -9,6 +9,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use App\Entity\PublishedDateEntityInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
+
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BlogPostRepository")
@@ -25,6 +27,9 @@ use App\Entity\PublishedDateEntityInterface;
  *              "access_control"="is_granted('IS_AUTHENTICATED_FULLY')"
  *           }
  * 
+ *      },
+ *      denormalizationContext={
+ *          "groups"={"post"}
  *      }
  * )
  */
@@ -41,6 +46,7 @@ class BlogPost implements AuthoredEntityInterface, PublishedDateEntityInterface
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
      * @Assert\Length(min=10)
+     * @Groups({"post"})
      */
     private $title;
 
@@ -51,7 +57,7 @@ class BlogPost implements AuthoredEntityInterface, PublishedDateEntityInterface
 
     /**
      * @ORM\Column(type="text")
-     * 
+     * @Groups({"post"})
      */
     private $content;
 
@@ -63,6 +69,7 @@ class BlogPost implements AuthoredEntityInterface, PublishedDateEntityInterface
 
     /**
      * @ORM\Column(type="string", length=200, nullable=true)
+     * @Groups({"post"})
      */
     private $slug;
     
