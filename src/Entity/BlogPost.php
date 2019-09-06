@@ -27,7 +27,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *           }
  *      },
  *      collectionOperations={
- *          "get",          
+ *          "get"={
+ *              "normalization_context"={
+ *                  "groups"={"get-blog-post-with-author"}
+ *              }
+ *          },          
  *          "post"={
  *              "access_control"="is_granted('IS_AUTHENTICATED_FULLY')"
  *           }
@@ -44,6 +48,7 @@ class BlogPost implements AuthoredEntityInterface, PublishedDateEntityInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"get-blog-post-with-author"})
      */
     private $id;
 
@@ -51,36 +56,39 @@ class BlogPost implements AuthoredEntityInterface, PublishedDateEntityInterface
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
      * @Assert\Length(min=10)
-     * @Groups({"post"})
+     * @Groups({"post", "get-blog-post-with-author"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"get-blog-post-with-author"})
      */
     private $published;
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"post"})
+     * @Groups({"post", "get-blog-post-with-author"})
      */
     private $content;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="posts")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"get-blog-post-with-author"})
      */
     private $author;
 
     /**
      * @ORM\Column(type="string", length=200, nullable=true)
-     * @Groups({"post"})
+     * @Groups({"post", "get-blog-post-with-author"})
      */
     private $slug;
     
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="blogPost")
      * @ApiSubresource()
+     * @Groups({"get-blog-post-with-author"})
      */
     private $comments;
 
