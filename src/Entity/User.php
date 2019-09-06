@@ -45,50 +45,50 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"get"})
+     * @Groups({"get", "get-comment-with-author"})
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"get", "post"})
+     * @ORM\Column(type="string", length=255)     
      * @Assert\NotBlank()
      * @Assert\Length(min=6, max=255)
+     * @Groups({"get", "post", "get-comment-with-author"})
      */
     private $username;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"put", "post"})
+     * @ORM\Column(type="string", length=255)     
      * @Assert\NotBlank()
      * @Assert\Regex(
      *  pattern="/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}/",
      *  message="Password must have at least 8 characters and have at least one number, one lower case letter and one uppercase letter"
      * )
+     * @Groups({"put", "post"})
      */
     private $password;
 
-    /**
-     * @Groups({"put", "post"})
+    /**     
      * @Assert\NotBlank()
      * @Assert\Expression(
      *  "this.getPassword() === this.getRetypedPassword()",
      *   message="Passwords does not match"
      * )
+     * @Groups({"put", "post"})
      */
     private $retypedPassword;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"get", "post", "put"})
+     * @ORM\Column(type="string", length=255)     
      * @Assert\NotBlank()
+     * @Groups({"get", "post", "put", "get-comment-with-author"})
      */
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"get", "post", "put"})
+     * @ORM\Column(type="string", length=255)     
      * @Assert\Email()
+     * @Groups({"get", "post", "put", "get-comment-with-author"})
      */
     private $email;
 
