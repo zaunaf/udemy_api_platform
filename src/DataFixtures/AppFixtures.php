@@ -28,24 +28,42 @@ class AppFixtures extends Fixture
             'password' => 'Rahasiy4',
             'name' => 'Admin',
             'email' => 'admin@gmail.com',
+            'roles' => [User::ROLE_SUPERADMIN]
         ],
         [
             'username' => 'abah',
             'password' => 'Rahasiy4',
             'name' => 'Abah',
             'email' => 'abah@gmail.com',
+            'roles' => [User::ROLE_ADMIN]
         ],
         [
             'username' => 'zuckachev',
             'password' => 'Rahasiy4',
             'name' => 'Zuckachev',
             'email' => 'zuckachev@gmail.com',
+            'roles' => [User::ROLE_WRITER]
         ],
         [
             'username' => 'zuck',
             'password' => 'Rahasiy4',
             'name' => 'Zuck',
             'email' => 'zuck@gmail.com',
+            'roles' => [User::ROLE_EDITOR]
+        ],
+        [
+            'username' => 'wawansky',
+            'password' => 'Rahasiy4',
+            'name' => 'Wawan Sky',
+            'email' => 'wawansky@gmail.com',
+            'roles' => [User::ROLE_COMMENTATOR]
+        ],
+        [
+            'username' => 'surasep',
+            'password' => 'Rahasiy4',
+            'name' => 'Surasep',
+            'email' => 'Surasep@gmail.com',
+            'roles' => [User::ROLE_COMMENTATOR]
         ]
     ];
 
@@ -75,6 +93,7 @@ class AppFixtures extends Fixture
             $user->setPassword($this->passwordEncoder->encodePassword($user, $userFixture['password']));
             $user->setName($userFixture['name']);
             $user->setEmail($userFixture['email']);
+            $user->setRoles($userFixture['roles']);
             $objectManager->persist($user);
             $this->addReference('user_'.$userFixture['username'], $user);
         }
@@ -98,9 +117,31 @@ class AppFixtures extends Fixture
         $objectManager->flush();
     }
     
-    public function getRandomUserReference(): User
-    {        
-        return $this->getReference('user_'.self::USERS[rand(0,3)]['username']);
+    public function getRandomUserReference($entity): User
+    {
+        $randomUser = self::USERS[rand(0,5)];
+
+        if ($entity instanceof BlogPost && !count(
+            array_intersect(
+                $randomUser['roles'],
+                [User::ROLE_SUPERADMIN, User::ROLE_ADMIN, User::ROLE_WRITER]
+            )
+        )) {
+            return $this->getRandomUserReference($entity);            
+        }
+        
+        if ($entity instanceof Comment && !count(
+            array_intersect(
+                $randomUser['roles'],
+                [User::ROLE_SUPERADMIN, User::ROLE_ADMIN, User::ROLE_WRITER, User::ROLE_COMMENTATOR]
+            )
+        )) {
+            return $this->getRandomUserReference($entity);
+            
+        }
+        
+        return $this->getReference('user_'.$randomUser['username']);
+        // return $this->getReference('user_'.self::USERS[rand(0,3)]['username']);
     }
 
     public function loadBlogPosts(ObjectManager $objectManager)
@@ -157,7 +198,7 @@ class AppFixtures extends Fixture
             
             // Randomize this
             // $blogPost->setAuthor($this->getReference('user_admin'));
-            $blogPost->setAuthor($this->getRandomUserReference());
+            $blogPost->setAuthor($this->getRandomUserReference($blogPost));
             
             $blogPost->setSlug($slug);
             $objectManager->persist($blogPost);
@@ -200,7 +241,7 @@ class AppFixtures extends Fixture
                 
                 // Randomize this
                 // $comment->setAuthor($this->getReference('user_zuck'));
-                $comment->setAuthor($this->getRandomUserReference());
+                $comment->setAuthor($this->getRandomUserReference($comment));
 
                 $comment->setBlogPost($this->getReference('blog_post_'.$i));
                 $objectManager->persist($comment);
