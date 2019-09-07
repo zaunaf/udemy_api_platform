@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *              }
  *          },
  *          "put"={
- *              "access_control"="is_granted('IS_AUTHENTICATED_FULLY') and object.getAuthor() == user"
+ *              "access_control"="is_granted('ROLE_WRITER') or (is_granted('ROLE_WRITER') and object.getAuthor() == user)"
  *           }
  *      },
  *      collectionOperations={
@@ -33,7 +33,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *              }
  *          },          
  *          "post"={
- *              "access_control"="is_granted('IS_AUTHENTICATED_FULLY')"
+ *              "access_control"="is_granted('ROLE_WRITER')"
  *           }
  * 
  *      },
