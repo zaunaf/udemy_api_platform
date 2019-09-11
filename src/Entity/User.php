@@ -95,7 +95,7 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=255)     
      * @Assert\Email()
-     * @Groups({"get", "post", "put", "get-comment-with-author", "get-blog-post-with-author", "get-admin"})
+     * @Groups({"post", "put", "get-comment-with-author", "get-blog-post-with-author", "get-admin", "get-owner"})
      */
     private $email;
 
