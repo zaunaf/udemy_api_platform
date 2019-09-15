@@ -23,15 +23,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *              }
  *          },
  *          "put"={
- *              "access_control"="is_granted('ROLE_WRITER') or (is_granted('ROLE_WRITER') and object.getAuthor() == user)"
+ *              "access_control"="is_granted('ROLE_EDITOR') or (is_granted('ROLE_WRITER') and object.getAuthor() == user)"
  *           }
  *      },
  *      collectionOperations={
- *          "get"={
- *              "normalization_context"={
- *                  "groups"={"get-blog-post-with-author"}
- *              }
- *          },          
+ *          "get",
  *          "post"={
  *              "access_control"="is_granted('ROLE_WRITER')"
  *           }
@@ -92,9 +88,18 @@ class BlogPost implements AuthoredEntityInterface, PublishedDateEntityInterface
      */
     private $comments;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Image")
+     * @ORM\JoinTable()
+     * @ApiSubresource()
+     * @Groups({"post"})
+     */
+    private $images;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
+        $this->images = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -179,4 +184,18 @@ class BlogPost implements AuthoredEntityInterface, PublishedDateEntityInterface
         return $this;
     }
 
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+
+    public function addImage(Image $image)
+    {
+        $this->images->add($image);
+    }
+
+    public function removeImage(Image $image)
+    {
+        $this->images->remove($image);
+    }
 }
