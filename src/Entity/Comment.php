@@ -11,6 +11,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CommentRepository")
  * @ApiResource(
+ *      attributes={
+ *          "order"={
+ *              "published": "DESC"
+ *          },
+ *          "pagination_enabled"=true
+ *      },
  *      itemOperations={
  *          "get",
  *          "put"={
